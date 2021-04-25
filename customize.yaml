@@ -1,0 +1,4 @@
+light.bedroom_lights:
+  entity_id: bedroom_lights
+  id: bedroom_lights
+  friendly_name: bedroom_lights
