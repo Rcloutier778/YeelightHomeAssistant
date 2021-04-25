@@ -1,0 +1,11 @@
+resources:
+  - url: !file /hacsfiles/lovelace-state-switch/state-switch.js
+    type: module
+  - url: !file /hacsfiles/rgb-light-card/card.js
+    type: module
+  - url: !file /hacsfiles/lovelace-layout-card/layout-card.js
+    type: module
+  - url: !file /hacsfiles/lovelace-paper-buttons-row/paper-buttons-row.js
+    type: module
+views:
+    - !include lovelace/main.yaml

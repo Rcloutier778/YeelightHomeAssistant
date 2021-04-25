@@ -1,0 +1,74 @@
+
+# Configure a default setup of Home Assistant (frontend, api, etc)
+default_config:
+
+# Text to speech
+tts:
+  - platform: google_translate
+
+group: !include groups.yaml
+automation: !include automations.yaml
+script: !include scripts.yaml
+scene: !include scenes.yaml
+
+
+lovelace_gen:
+    rooms:
+      - LivingRoom
+      - Bedroom
+    lowercase_room:
+        LivingRoom: livingroom
+        Bedroom: bedroom
+    room_to_light_panel_id:
+        LivingRoom: '9'
+        Bedroom: '4'
+    button_to_icon:
+        toggle: 'hass:lightbulb'
+        autoset: 'mdi:clock'
+        day: 'mdi:weather-sunny'
+        dusk: 'mdi:weather-sunset'
+        night: 'mdi:weather-sunset-down'
+        sleep: 'mdi:moon-waning-crescent'
+    default_room: Bedroom
+
+
+lovelace:
+    mode: yaml
+
+    resources:
+      - url: /hacsfiles/lovelace-state-switch/state-switch.js
+        type: module
+      - url: /hacsfiles/rgb-light-card/card.js
+        type: module
+      - url: /hacsfiles/lovelace-layout-card/layout-card.js
+        type: module
+      - url: /hacsfiles/lovelace-paper-buttons-row/paper-buttons-row.js
+        type: module
+      - url: /hacsfiles/lovelace-card-mod/card-mod.js
+        type: module
+
+
+rest_command:
+    my_request:
+        url: http://10.0.0.17:9001
+        method: POST
+        payload: '{"newState":"{{ newState }}","eventType":"dashboard","room":"{{ room }}"}'
+    rgb_request:
+        url: http://10.0.0.17:9001
+        method: POST
+        payload: '{"newState":"{{ newState }}","eventType":"dashboard","room":"{{ room }}","red":"{{ red }}","green":"{{ green }}","blue":"{{ blue }}"}'
+
+sensor:
+    - platform: rest
+      resource: "http://10.0.0.17:9001"
+      name: "yeelight"
+
+light:
+  - platform: group
+    name: Bedroom Lights
+    entities:
+      - light.yeelight1
+      - light.yeelight2
+      - light.yeelight3
+  - platform: group
+    name: LivingRoom Lights

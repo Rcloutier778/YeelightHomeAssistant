@@ -1,0 +1,8 @@
+reload_configs:
+  alias: Reload Configs
+  sequence:
+  - service: homeassistant.reload_core_config
+  - service: homeassistant.reload_config_entry
+    target:
+      area_id: bedroom
+  mode: single

@@ -1,0 +1,189 @@
+# lovelace_gen
+
+title: Home
+path: Home
+type: custom:horizontal-layout
+layout:
+    width: 300
+    max_cols: 10
+cards:
+    # global buttons
+  - type: horizontal-stack
+    cards:
+{% for bttn, icn in _global.button_to_icon.items() %}
+      - type: button
+        name: {{bttn}}
+        icon: {{icn}}
+        aspect_ratio: 25%
+        tap_action:
+          action: call-service
+          service: rest_command.my_request
+          service_data:
+            newState: {{bttn}}
+            room: global
+{% endfor %}
+  - type: iframe
+    url: 'http://10.0.0.17:3000/d-solo/AQM/aqm?orgId=1&refresh=10s&panelId=2'
+    aspect_ratio: 50%
+  - type: iframe
+    url: 'http://10.0.0.17:3000/d-solo/AQM/aqm?orgId=1&refresh=10s&panelId=23'
+    aspect_ratio: 50%
+  - type: iframe
+    url: 'http://10.0.0.17:3000/d-solo/AQM/aqm?orgId=1&refresh=10s&panelId=4'
+    aspect_ratio: 50%
+  - type: iframe
+    url: 'http://10.0.0.17:3000/d-solo/AQM/aqm?orgId=1&refresh=10s&panelId=25'
+    aspect_ratio: 50%
+# Room level options
+  - type: vertical-stack
+    cards:
+        # Room select
+      - type: horizontal-stack
+        cards:
+{% for room in _global.rooms %}
+          - type: button
+            name: {{room}}
+            show_state: true
+            tap_action:
+              action: call-service
+              service: input_select.select_option
+              service_data:
+                option: {{room}}
+              target:
+                entity_id: input_select.room
+{% endfor %}
+      - type: 'custom:state-switch'
+        entity: input_select.room
+        default: {{_global.default_room}} 
+        states:
+{% for room in _global.rooms %}
+          {{room}}:
+            type: vertical-stack
+            cards:
+                # Grafana light temperature
+              - type: iframe
+                url: >-
+                  http://10.0.0.17:3000/d-solo/pWwtxUWgk/yeelight?orgId=1&panelId={{_global.room_to_light_panel_id[room]}}
+                aspect_ratio: 35%
+                # Room level buttons
+              - type: horizontal-stack
+                cards:
+{% for bttn, icn in _global.button_to_icon.items() %}
+                  - type: button
+                    name: {{bttn}}
+                    entity: input_select.room
+                    icon: {{icn}}
+                    aspect_ratio: 25%
+                    tap_action:
+                      action: call-service
+                      service: rest_command.my_request
+                      service_data:
+                        newState: {{bttn}}
+                        room: {{room}}
+{% endfor %}
+                # RGB options
+              - type: entities
+                show_header_toggle: false
+                entities:
+                  - entity: light.{{_global.lowercase_room[room]}}_lights
+                  - type: 'custom:rgb-light-card'
+                    entity: light.{{_global.lowercase_room[room]}}_lights
+                    colors:
+                      - type: call-service
+                        icon_color: rgba(255, 0, 0, 1)
+                        service: rest_command.rgb_request
+                        service_data:
+                          newState: rgb
+                          room: {{room}}
+                          red: 255
+                          green: 0
+                          blue: 0
+                      - type: call-service
+                        icon_color: rgba(255, 127, 0, 1)
+                        service: rest_command.rgb_request
+                        service_data:
+                          newState: rgb
+                          room: {{room}}
+                          red: 255
+                          green: 127
+                          blue: 0
+                      - type: call-service
+                        icon_color: rgba(255, 255, 0, 1)
+                        service: rest_command.rgb_request
+                        service_data:
+                          newState: rgb
+                          room: {{room}}
+                          red: 255
+                          green: 255
+                          blue: 0
+                      - type: call-service
+                        icon_color: rgba(0, 255, 0, 1)
+                        service: rest_command.rgb_request
+                        service_data:
+                          newState: rgb
+                          room: {{room}}
+                          red: 0
+                          green: 255
+                          blue: 0
+                      - type: call-service
+                        icon_color: rgba(0, 255, 255, 1)
+                        service: rest_command.rgb_request
+                        service_data:
+                          newState: sleep
+                          room: {{room}}
+                          red: 0
+                          green: 255
+                          blue: 255
+                      - type: call-service
+                        icon_color: rgba(0, 0, 255, 1)
+                        service: rest_command.rgb_request
+                        service_data:
+                          newState: rgb
+                          room: {{room}}
+                          red: 0
+                          green: 0
+                          blue: 255
+                      - type: call-service
+                        icon_color: rgba(255, 0, 255, 1)
+                        service: rest_command.rgb_request
+                        service_data:
+                          newState: rgb
+                          room: {{room}}
+                          red: 255
+                          green: 0
+                          blue: 255            
+{% endfor %}
+  - type: iframe
+    url: 'http://10.0.0.17:3000/d-solo/AQM/aqm?orgId=1&refresh=10s&panelId=10'
+    aspect_ratio: 50%
+  - type: iframe
+    url: 'http://10.0.0.17:3000/d-solo/AQM/aqm?orgId=1&refresh=10s&panelId=6'
+    aspect_ratio: 50%
+   
+    # Reload / Restart button
+  - type: custom:mod-card
+    card:
+        type: button
+        icon: 'mdi:restart'
+        icon_height: 40px
+        tap_action:
+          action: call-service
+          service: script.reload_configs
+        hold_action:
+          action: call-service
+          confirmation:
+            text: Are you sure you want to restart?
+          service: homeassistant.restart
+        double_tap_action:
+          action: call-service
+          confirmation:
+            text: Are you sure you want to restart?
+          service: homeassistant.restart
+    card_mod:
+        style: |
+            ha-card {
+                position: absolute;
+                bottom: 0px;
+                right: 0px;
+            }
+
