@@ -17,7 +17,7 @@ cards:
         aspect_ratio: 25%
         tap_action:
           action: call-service
-          service: rest_command.my_request
+          service: rest_command.yeelight_action
           service_data:
             newState: {{bttn}}
             room: global
@@ -76,7 +76,7 @@ cards:
                     aspect_ratio: 25%
                     tap_action:
                       action: call-service
-                      service: rest_command.my_request
+                      service: rest_command.yeelight_action
                       service_data:
                         newState: {{bttn}}
                         room: {{room}}
